@@ -6,12 +6,17 @@ import request, { Response } from "@/utils/axiosReq";
 export interface IRequestUsers {
   page: number; // 页码
   page_size: number; // 每页数量
+  username?: string | null;
+  email?: string | null;
 }
 
 export interface IUser {
-  id?: number | null; // 主键ID
+  id: number; // 主键ID
   username?: string | null; // 用户名
-  email?: string | null; // 邮箱
+  name?: string | null; // 姓名
+  email: string; // 邮箱
+  update_time: number; // 活跃时间戳
+  ban?: boolean | null; // 账号是否禁用
 }
 
 export interface IResponseUsers {

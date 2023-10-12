@@ -2,9 +2,10 @@
 import { ref, onMounted } from "vue";
 import { GetUsers, IRequestUsers, IUser, IResponseUsers } from "@/api/user.pb";
 import { Response } from "@/utils/axiosReq";
+import { getTimeStr } from "@/utils/time";
 
 defineOptions({
-  name: "PermissionPage"
+  name: "PermissionUser"
 });
 
 const showTree = ref(false);
@@ -23,25 +24,57 @@ const getUserList = () => {
   });
 };
 
-const onChangeShow = () => {
-  showTree.value = !showTree.value;
+const onSearch = () => {
+  getUserList();
+};
+const onResetSearch = () => {
+  requestParam.value = {
+    page: requestParam.value.page,
+    page_size: requestParam.value.page_size
+  };
 };
 
 onMounted(() => {
   getUserList();
 });
+
+const handleSizeChange = (val: number) => {
+  requestParam.value.page_size = val;
+  getUserList();
+};
+const handleCurrentChange = (val: number) => {
+  requestParam.value.page = val;
+  getUserList();
+};
 </script>
 
 <template>
   <div class="space">
     <el-row>
-      <el-button type="primary" v-if="showTree" @click="onChangeShow"
-        >树状显示
-      </el-button>
-      <el-button type="primary" v-if="!showTree" @click="onChangeShow"
-        >表格显示
-      </el-button>
-      <el-button type="primary">创建角色</el-button>
+      <el-form :inline="true" :model="requestParam" class="demo-form-inline">
+        <el-form-item label="用户名">
+          <el-input
+            v-model="requestParam.username"
+            placeholder="请输入用户名"
+            clearable
+          />
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input
+            v-model="requestParam.email"
+            placeholder="请输入邮箱"
+            clearable
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSearch" size="small"
+            >搜索</el-button
+          >
+          <el-button type="primary" @click="onResetSearch" size="small"
+            >重置</el-button
+          >
+        </el-form-item>
+      </el-form>
     </el-row>
     <el-row>
       <el-table :data="userList" border style="width: 100%" :fit="true">
@@ -56,18 +89,44 @@ onMounted(() => {
         <!--          </template>-->
         <!--        </el-table-column>-->
         <!--        <el-table-column prop="create_user" label="创建人" />-->
-        <!--        <el-table-column prop="update_time" label="更新时间" min-width="100">-->
-        <!--          <template #default="scope">-->
-        <!--            {{ getTimeStr(scope.row.update_time) }}-->
-        <!--          </template>-->
-        <!--        </el-table-column>-->
-        <!--        <el-table-column prop="update_user" label="更新人" />-->
+        <el-table-column
+          prop="update_time"
+          label="最后活跃时间"
+          min-width="100"
+        >
+          <template #default="scope">
+            {{ getTimeStr(scope.row.update_time) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="update_user" label="是否禁用">
+          <template #default="scope">
+            <el-icon v-show="scope.row.ban" :size="20" color="red">
+              <Remove />
+            </el-icon>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" min-width="100">
-          <template #default>
+          <template #default="scope">
             <el-button type="primary" size="small">修改</el-button>
+            <el-button type="success" size="small" v-if="scope.row.ban"
+              >启用</el-button
+            >
+            <el-button type="warning" size="small" v-else>禁用用户</el-button>
           </template>
         </el-table-column>
       </el-table>
+    </el-row>
+    <el-row justify="end">
+      <el-pagination
+        :page-size="requestParam.page_size"
+        :page-sizes="[10, 20, 30, 40]"
+        :pager-count="5"
+        :small="small"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="userTotal"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
     </el-row>
   </div>
 </template>

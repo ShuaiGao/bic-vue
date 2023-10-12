@@ -26,9 +26,17 @@ const app = createApp(App);
 
 // 自定义指令
 import * as directives from "@/directives";
+
 Object.keys(directives).forEach(key => {
   app.directive(key, (directives as { [key: string]: Directive })[key]);
 });
+
+// element-plus icons
+import * as ElementPlusIconsVue from "@element-plus/icons-vue";
+
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component);
+}
 
 // 全局注册`@iconify/vue`图标库
 import {
@@ -36,12 +44,14 @@ import {
   IconifyIconOnline,
   FontIcon
 } from "./components/ReIcon";
+
 app.component("IconifyIconOffline", IconifyIconOffline);
 app.component("IconifyIconOnline", IconifyIconOnline);
 app.component("FontIcon", FontIcon);
 
 // 全局注册按钮级别权限组件
 import { Auth } from "@/components/ReAuth";
+
 app.component("Auth", Auth);
 
 getServerConfig(app).then(async config => {

@@ -23,7 +23,8 @@
     "prepare": "husky install",
     "preinstall": "npx only-allow pnpm",
     "pb": "pnpm pb:ts && pnpm lint:prettier",
-    "pb:ts": "bic-proto/script/protoc --plugin=protoc-gen-bic=bic-proto/script/protoc-gen-bic --plugin=protoc-gen-go=bic-proto/script/protoc-gen-go --bic_out=ts_dir=src/api:. bic-proto/http/*.proto --proto_path=bic-proto"
+    "pb:ts": "bic-proto/script/protoc --plugin=protoc-gen-bic=bic-proto/script/protoc-gen-bic --plugin=protoc-gen-go=bic-proto/script/protoc-gen-go --bic_out=ts_dir=src/api:. bic-proto/http/*.proto --proto_path=bic-proto",
+    "pb:js": "bic-proto/script/protoc --plugin=protoc-gen-bic=bic-proto/script/protoc-gen-bic --plugin=protoc-gen-go=bic-proto/script/protoc-gen-go --bic_out=js_dir=src/api:. bic-proto/http/*.proto --proto_path=bic-proto"
   },
   "browserslist": [
     "> 1%",
@@ -31,6 +32,7 @@
     "not op_mini all"
   ],
   "dependencies": {
+    "@element-plus/icons-vue": "^2.1.0",
     "@pureadmin/descriptions": "^1.1.1",
     "@pureadmin/table": "^2.3.2",
     "@pureadmin/utils": "^1.9.6",

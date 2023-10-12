@@ -27,12 +27,11 @@ const permissionRouter = {
       }
     },
     {
-      key: "/permission/role/index",
-      path: "/permission/role/index",
+      key: "/permission/user/index",
+      path: "/permission/user/index",
       name: "PermissionRole",
       meta: {
-        title: "用户管理",
-        roles: ["admin", "common"]
+        title: "用户管理"
       }
     },
     {
