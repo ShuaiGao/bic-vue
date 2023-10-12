@@ -1,0 +1,35 @@
+syntax = "proto3";
+package http;
+option go_package = "pkg/gen/api";
+
+message RequestAuth{
+  // @gotags: validate:"required"
+  string username = 1; // 用户名
+  // @gotags: validate:"required"
+  string password = 2; // 密码
+}
+
+message ResponseAuth{
+  // @gotags: validate:"required"
+  string token = 1;
+  // @gotags: validate:"required"
+  int64 expires = 2;
+  // @gotags: validate:"required"
+  string token_refresh = 3;
+  // @gotags: validate:"required"
+  int64 expires_refresh = 4;
+  string username = 5;
+  repeated string roles = 6;
+}
+
+message RequestRefreshToken{
+  // @gotags: validate:"required"
+  string token_refresh = 2;
+}
+
+service auth_service{
+  // @Summary: 获取用户列表 @url:/v1/auth/
+  rpc PostAuth(RequestAuth) returns (ResponseAuth);
+  // @Summary: 刷新token @url:/v1/token/refresh
+  rpc PostRefreshToken(RequestRefreshToken) returns (ResponseAuth);
+}

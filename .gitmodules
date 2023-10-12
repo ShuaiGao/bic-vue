@@ -1,0 +1,3 @@
+[submodule "bic-proto"]
+	path = bic-proto
+	url = https://github.com/ShuaiGao/bic-proto

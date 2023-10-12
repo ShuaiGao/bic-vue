@@ -1,0 +1,6 @@
+syntax = "proto3";
+package http;
+
+option go_package = "pkg/gen/api";
+
+message Empty {}

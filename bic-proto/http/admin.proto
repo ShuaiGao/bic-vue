@@ -1,0 +1,70 @@
+syntax = "proto3";
+package http;
+option go_package = "pkg/gen/api";
+import "http/common.proto";
+
+message RouteMeta{
+  string title = 1;
+  string icon = 2;
+  string rank = 3;
+  repeated string auths = 4;
+}
+
+message RouteItem{
+  RouteMeta meta = 1;
+  string path = 2;
+  string name = 3;
+  string key = 4;
+  repeated RouteItem children = 5;
+}
+
+message ResponseRoute{
+  repeated RouteItem item_list = 1;
+}
+
+message RequestRoute{
+}
+
+message RoleItem{
+  // @gotags: validate:"required"
+  uint32 id = 1;
+  // @gotags: validate:"required"
+  string name = 2;
+  int64 create_time = 4; // 创建时间
+  string create_user = 5; // 创建用户
+  int64 update_time = 6; // 更新时间
+  string update_user = 7; // 更新用户
+  string remark = 8;// 备注
+  uint32 father_id = 9; // 父角色ID
+  string father_name = 10; // 父角色名
+}
+
+message ResponseRoles{
+//  uint32 page = 1;
+//  uint32 page_size = 2;
+//  uint32 total = 3;
+  repeated RoleItem data_list = 4;
+}
+
+message ResponseGetRole{
+  // @gotags: validate:"required"
+  uint32 id = 1;
+  // @gotags: validate:"required"
+  string name = 2;
+  int64 create_time = 4; // 创建时间
+  string create_user = 5; // 创建用户
+  int64 update_time = 6; // 更新时间
+  string update_user = 7; // 更新用户
+  string remark = 8;// 备注
+  uint32 father_id = 9; // 父角色ID
+  string father_name = 10; // 父角色名
+}
+
+service admin_service{
+  // @Summary: 获取路由 @url:/v1/routes/
+  rpc GetRoutes(http.Empty) returns (ResponseRoute);
+  // @Summary: 获取角色列表 @url:/v1/roles/
+  rpc GetRoles(http.Empty) returns (ResponseRoles);
+  // @Summary: 获取角色详情 @url:/v1/role/<uint:id>/
+  rpc GetRole(http.Empty) returns (ResponseGetRole);
+}
