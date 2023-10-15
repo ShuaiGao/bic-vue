@@ -93,7 +93,7 @@ const roles: IRoleItem[] = [
     create_user: "子嘉",
     update_time: new Date().getTime(),
     update_user: "子嘉",
-    father_id: 3,
+    father_id: 1,
     father_name: "客服部门组长"
   },
   {
