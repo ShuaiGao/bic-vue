@@ -51,6 +51,26 @@ export interface IResponseRoles {
   data_list?: IRoleItem[] | null;
 }
 
+export interface IPageItem {
+  id: string;
+  label?: string | null;
+  checked?: boolean | null;
+}
+
+export interface IRouteNode {
+  id: string;
+  label?: string | null;
+  items?: IPageItem[] | null;
+  children?: IRouteNode[] | null;
+}
+
+export interface IRouteNode {
+  id: string;
+  label?: string | null;
+  items?: IPageItem[] | null;
+  children?: IRouteNode[] | null;
+}
+
 export interface IResponseGetRole {
   id: number;
   name: string;
@@ -61,6 +81,37 @@ export interface IResponseGetRole {
   remark?: string | null; // 备注
   father_id?: number | null; // 父角色ID
   father_name?: string | null; // 父角色名
+  route_list?: IRouteNode[] | null;
+}
+
+export interface IHttpMethod {
+  url: string;
+  method: string;
+  note?: string | null;
+}
+
+export interface IMenuPageItem {
+  id: string;
+  label?: string | null;
+  methods?: IHttpMethod[] | null; // 对应http接口
+}
+
+export interface IMenuItem {
+  id: string;
+  label: string;
+  items?: IMenuPageItem[] | null;
+  children?: IMenuItem[] | null;
+}
+
+export interface IMenuItem {
+  id: string;
+  label: string;
+  items?: IMenuPageItem[] | null;
+  children?: IMenuItem[] | null;
+}
+
+export interface IResponseGetMenus {
+  route_list?: IMenuItem[] | null;
 }
 
 // 获取路由
@@ -86,6 +137,14 @@ export function GetRoles(): Promise<Response<IResponseRoles>> {
 export function GetRole(id: number): Promise<Response<IResponseGetRole>> {
   return request({
     url: "/v1/role/" + id + "/",
+    method: "GET"
+  });
+}
+
+// 获取菜单列表
+export function GetMenus(): Promise<Response<IResponseGetMenus>> {
+  return request({
+    url: "/v1/menus/",
     method: "GET"
   });
 }
