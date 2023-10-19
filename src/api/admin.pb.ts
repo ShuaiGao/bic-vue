@@ -4,6 +4,12 @@
 import request, { Response } from "@/utils/axiosReq";
 import { IEmpty } from "./common.pb";
 
+export enum EMenuItemType {
+  MenuItemType_none = 0,
+  MenuItemType_folder = 1,
+  MenuItemType_document = 2
+}
+
 export interface IRouteMeta {
   title?: string | null;
   icon?: string | null;
@@ -90,7 +96,7 @@ export interface IHttpMethod {
   note?: string | null;
 }
 
-export interface IMenuPageItem {
+export interface IMenuPageAction {
   id: string;
   label?: string | null;
   methods?: IHttpMethod[] | null; // 对应http接口
@@ -99,19 +105,27 @@ export interface IMenuPageItem {
 export interface IMenuItem {
   id: string;
   label: string;
-  items?: IMenuPageItem[] | null;
+  menu_item_type: EMenuItemType;
+  items?: IMenuPageAction[] | null;
   children?: IMenuItem[] | null;
 }
 
 export interface IMenuItem {
   id: string;
   label: string;
-  items?: IMenuPageItem[] | null;
+  menu_item_type: EMenuItemType;
+  items?: IMenuPageAction[] | null;
   children?: IMenuItem[] | null;
 }
 
 export interface IResponseGetMenus {
   route_list?: IMenuItem[] | null;
+}
+
+export interface IRequestPostMenuPageAction {
+  id: string;
+  label: string;
+  methods?: IHttpMethod[] | null; // 对应http接口
 }
 
 // 获取路由
@@ -146,5 +160,16 @@ export function GetMenus(): Promise<Response<IResponseGetMenus>> {
   return request({
     url: "/v1/menus/",
     method: "GET"
+  });
+}
+
+// 添加菜单页面行为
+export function PostMenuPageAction(
+  data: IRequestPostMenuPageAction
+): Promise<Response<IEmpty>> {
+  return request({
+    url: "/v1/menu/page/action/",
+    method: "POST",
+    data
   });
 }

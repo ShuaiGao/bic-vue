@@ -3,11 +3,18 @@
 
 import request, { Response } from "@/utils/axiosReq";
 
+export enum EUserBanStatus {
+  ban_none = 0,
+  ban_available = 1,
+  ban_forbidden = 2
+}
+
 export interface IRequestUsers {
   page: number; // 页码
   page_size: number; // 每页数量
   username?: string | null;
   email?: string | null;
+  ban?: EUserBanStatus | null;
 }
 
 export interface IUser {

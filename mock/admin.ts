@@ -77,10 +77,12 @@ const menus: IResponseGetMenus[] = [
   {
     id: "menu-permission",
     label: "权限管理",
+    menu_item_type: 1,
     children: [
       {
         id: "menu-permission-user",
         label: "用户管理",
+        menu_item_type: 2,
         items: [
           {
             id: "menu-permission-user-add",
@@ -117,11 +119,89 @@ const menus: IResponseGetMenus[] = [
       },
       {
         id: "menu-permission-role",
-        label: "角色管理"
+        label: "角色管理",
+        menu_item_type: 2,
+        items: [
+          {
+            id: "menu-permission-role-get",
+            label: "搜索",
+            methods: [
+              {
+                url: "/v1/roles/",
+                method: "GET",
+                note: "获取角色列表"
+              }
+            ]
+          },
+          {
+            id: "menu-permission-role-modify",
+            label: "修改角色",
+            methods: [
+              {
+                url: "/v1/role/:id/",
+                method: "PATCH"
+              }
+            ]
+          },
+          {
+            id: "menu-permission-role-delete",
+            label: "删除角色",
+            methods: [
+              {
+                url: "/v1/role/:id/",
+                method: "DELETE"
+              }
+            ]
+          }
+        ]
       },
       {
         id: "menu-permission-menu",
-        label: "菜单管理"
+        label: "菜单管理",
+        menu_item_type: 2,
+        items: [
+          {
+            id: "menu-permission-menu-get",
+            label: "搜索",
+            methods: [
+              {
+                url: "/v1/menu/",
+                method: "GET",
+                note: "获取菜单列表"
+              }
+            ]
+          },
+          {
+            id: "menu-permission-menu-modify",
+            label: "修改菜单",
+            methods: [
+              {
+                url: "/v1/menu/:id/",
+                method: "PATCH"
+              }
+            ]
+          },
+          {
+            id: "menu-permission-menu-post",
+            label: "添加菜单",
+            methods: [
+              {
+                url: "/v1/menu/:id/",
+                method: "POST"
+              }
+            ]
+          },
+          {
+            id: "menu-permission-menu-delete",
+            label: "删除菜单",
+            methods: [
+              {
+                url: "/v1/menus/",
+                method: "DELETE"
+              }
+            ]
+          }
+        ]
       }
     ]
   }
