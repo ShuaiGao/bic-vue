@@ -1,5 +1,5 @@
 import { Response } from "@/utils/axiosReq";
-import { IResponseRoles, IRoleItem } from "@/api/admin.pb";
+import { IResponseGetMenus, IResponseRoles, IRoleItem } from "@/api/admin.pb";
 import { MockMethod } from "vite-plugin-mock";
 
 const roles: IRoleItem[] = [
@@ -72,6 +72,60 @@ const roles: IRoleItem[] = [
     father_name: "管理员"
   }
 ];
+
+const menus: IResponseGetMenus[] = [
+  {
+    id: "menu-permission",
+    label: "权限管理",
+    children: [
+      {
+        id: "menu-permission-user",
+        label: "用户管理",
+        items: [
+          {
+            id: "menu-permission-user-add",
+            label: "添加用户",
+            methods: [
+              {
+                url: "/v1/users/",
+                method: "GET",
+                note: "添加用户"
+              }
+            ]
+          },
+          {
+            id: "menu-permission-user-modify",
+            label: "修改用户",
+            methods: [
+              {
+                url: "/v1/user/:id/",
+                method: "PATCH"
+              }
+            ]
+          },
+          {
+            id: "menu-permission-user-ban",
+            label: "禁用用户",
+            methods: [
+              {
+                url: "/v1/user/:id/",
+                method: "GET"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "menu-permission-role",
+        label: "角色管理"
+      },
+      {
+        id: "menu-permission-menu",
+        label: "菜单管理"
+      }
+    ]
+  }
+];
 export default [
   {
     url: "/v1/roles/",
@@ -82,6 +136,19 @@ export default [
         detail: "success",
         data: {
           data_list: roles
+        }
+      };
+    }
+  },
+  {
+    url: "/v1/menus/",
+    method: "get",
+    response: (): Response<IResponseGetMenus> => {
+      return {
+        code: 0,
+        detail: "success",
+        data: {
+          route_list: menus
         }
       };
     }
