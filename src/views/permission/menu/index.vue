@@ -1,14 +1,22 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { Response } from "@/utils/axiosReq";
+import type Node from "element-plus/es/components/tree/src/model/node";
 import {
+  EMenuItemType,
   GetMenus,
   IMenuItem,
-  IResponseGetMenus,
   IRequestPostMenuPageAction,
-  EMenuItemType
+  IResponseGetMenus
 } from "@/api/admin.pb";
-import { Edit, Delete, Plus, Minus } from "@element-plus/icons-vue";
+import {
+  Delete,
+  Edit,
+  Minus,
+  Plus,
+  Folder,
+  Document
+} from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { md5 } from "js-md5";
 
@@ -16,6 +24,19 @@ defineOptions({
   name: "PermissionButton"
 });
 
+interface FormRename {
+  id: string;
+  name: string;
+}
+
+interface FormAddTreeItem {
+  id: string;
+  label: string;
+  item_type: EMenuItemType;
+}
+
+const dialogAddTreeItemVisible = ref(false);
+const dialogRenameVisible = ref(false);
 const dialogAddVisible = ref(false);
 const menuList = ref<IMenuItem[]>([]);
 const selectMenu = ref<IMenuItem>();
@@ -23,6 +44,15 @@ const formAddPageAction = ref<IRequestPostMenuPageAction>({
   id: "",
   label: "",
   methods: [{ method: "", url: "", note: "" }]
+});
+const formRename = ref<FormRename>({
+  id: "",
+  name: ""
+});
+const formAddTreeItem = ref<FormAddTreeItem>({
+  id: "",
+  label: "",
+  item_type: EMenuItemType.MenuItemType_folder
 });
 
 const getMenuList = () => {
@@ -51,6 +81,8 @@ const getHttpMethodType = (method: string): string => {
 const onNodeClick = (_: any, node: any) => {
   console.log(node);
   selectMenu.value = node.data;
+  formRename.value.id = node.data.id;
+  formRename.value.name = node.data.label;
 };
 const defaultProps = {
   children: "children",
@@ -90,9 +122,96 @@ const onGenID = () => {
   hash.update(new Date().getUTCMilliseconds() + "");
   formAddPageAction.value.id = hash.hex();
 };
+
+const onRenameEx = (ItemList: IMenuItem[]): boolean => {
+  let find = false;
+  for (let i = 0; i < ItemList.length; i++) {
+    if (ItemList[i].id == formRename.value.id) {
+      find = true;
+      ItemList[i].label = formRename.value.name;
+      break;
+    }
+    if (!menuList.value[i].children) {
+      continue;
+    }
+    find = onRenameEx(menuList.value[i].children);
+    if (find) break;
+  }
+  return find;
+};
+const onRename = () => {
+  const find = onRenameEx(menuList.value);
+  if (find) {
+    dialogRenameVisible.value = false;
+  } else {
+    ElMessage({
+      message: "查找菜单id错误",
+      type: "warning"
+    });
+  }
+};
+
+const onAddTreeItem = () => {
+  menuList.value.push({
+    id: formAddTreeItem.value.id,
+    label: formAddTreeItem.value.label,
+    menu_item_type: formAddTreeItem.value.item_type
+  });
+  ElMessage({
+    message: "添加成功",
+    type: "success"
+  });
+  dialogAddTreeItemVisible.value = false;
+};
+
+const allowDrop = (draggingNode: Node, dropNode: Node): boolean => {
+  return dropNode.data.menu_item_type !== EMenuItemType.MenuItemType_document;
+};
 </script>
 
 <template>
+  <el-dialog v-model="dialogAddTreeItemVisible" title="新建菜单" width="400px">
+    <el-form :model="formAddTreeItem">
+      <el-form-item label="id" label-width="40px">
+        <el-input v-model="formAddTreeItem.id" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="label" label-width="40px">
+        <el-input v-model="formAddTreeItem.label" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="菜单类型">
+        <el-radio-group v-model="formAddTreeItem.item_type">
+          <el-radio :label="EMenuItemType.MenuItemType_folder">目录</el-radio>
+          <el-radio :label="EMenuItemType.MenuItemType_document">页面</el-radio>
+        </el-radio-group>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogAddTreeItemVisible = false">取消</el-button>
+        <el-button type="primary" style="width: 120px" @click="onAddTreeItem">
+          确定
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
+  <el-dialog v-model="dialogRenameVisible" title="重命名菜单" width="40%">
+    <el-form :model="formRename">
+      <el-form-item label="id" label-width="40px">
+        <el-input v-model="formRename.id" autocomplete="off" readonly />
+      </el-form-item>
+      <el-form-item label="label" label-width="40px">
+        <el-input v-model="formRename.name" autocomplete="off" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogRenameVisible = false">取消</el-button>
+        <el-button type="primary" style="width: 120px" @click="onRename()">
+          确定
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
   <el-dialog v-model="dialogAddVisible" title="添加操作（行为）" width="40%">
     <el-form :model="formAddPageAction">
       <el-row>
@@ -175,7 +294,7 @@ const onGenID = () => {
     </template>
   </el-dialog>
   <el-row :gutter="10">
-    <el-col :lg="6" :xs="10" :sm="10" :md="8">
+    <el-col :lg="6" :xs="10" :sm="10" :md="8" class="m-2">
       <el-tree
         :data="menuList"
         show-checkbox
@@ -185,12 +304,15 @@ const onGenID = () => {
         :default-checked-keys="[5]"
         :props="defaultProps"
         :default-expand-all="true"
+        :allow-drop="allowDrop"
         @node-click="onNodeClick"
         draggable
       >
         <template #default="{ node, data }">
           <span class="custom-tree-node">
-            <span>{{ node.label }} {{ node.menu_item_type }}</span>
+            <span :class="node.children ? 'node-err-wrap' : ''"
+              >{{ node.label }} {{ node.menu_item_type }}</span
+            >
             <el-icon
               v-if="data.menu_item_type == EMenuItemType.MenuItemType_folder"
             >
@@ -205,17 +327,40 @@ const onGenID = () => {
         </template>
       </el-tree>
     </el-col>
-    <el-row :span="18" class="m-3" :xs="14" :sm="14" :md="16">
-      <el-col>
+    <el-col :span="18" class="m-3" :xs="14" :sm="14" :md="16">
+      <el-col class="p-2">
+        <el-row>
+          <el-button
+            type="primary"
+            style="width: 100px"
+            @click="dialogAddTreeItemVisible = true"
+          >
+            新建目录
+          </el-button>
+          <el-button
+            type="primary"
+            style="width: 100px"
+            @click="dialogAddTreeItemVisible = true"
+          >
+            新建页面
+          </el-button>
+        </el-row>
         <el-row> 界面权限详情，菜单顺序可通过拖拽操作调整</el-row>
-        <el-row class="m-2">
-          <el-button type="primary" @click="dialogAddVisible = true"
+        <el-row>
+          <el-button type="primary" @click="dialogRenameVisible = true"
             >重命名菜单
           </el-button>
-          <el-button type="primary">添加行为权限</el-button>
+          <el-button
+            v-if="
+              selectMenu?.menu_item_type == EMenuItemType.MenuItemType_document
+            "
+            type="primary"
+            @click="dialogAddVisible = true"
+            >添加行为权限
+          </el-button>
           <el-button type="danger">删除菜单</el-button>
         </el-row>
-        <el-row :gutter="10">
+        <el-row :gutter="10" class="mt-2">
           <el-space
             wrap
             v-bind:key="item.id"
@@ -254,10 +399,10 @@ const onGenID = () => {
             </el-card>
           </el-space>
         </el-row>
-        <el-row class="m-2">
+        <el-row class="mt-2">
           <el-button type="primary" @click="onSavePageItem">保存</el-button>
         </el-row>
       </el-col>
-    </el-row>
+    </el-col>
   </el-row>
 </template>

@@ -75,6 +75,33 @@ const roles: IRoleItem[] = [
 
 const menus: IResponseGetMenus[] = [
   {
+    id: "menu-home",
+    label: "首页",
+    menu_item_type: 2
+  },
+  {
+    id: "menu-err-page",
+    label: "异常界面",
+    menu_item_type: 1,
+    children: [
+      {
+        id: "menu-err-page-403",
+        label: "403",
+        menu_item_type: 2
+      },
+      {
+        id: "menu-err-page-404",
+        label: "404",
+        menu_item_type: 2
+      },
+      {
+        id: "menu-err-page-500",
+        label: "500",
+        menu_item_type: 2
+      }
+    ]
+  },
+  {
     id: "menu-permission",
     label: "权限管理",
     menu_item_type: 1,
