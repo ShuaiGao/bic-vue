@@ -28,7 +28,7 @@ const IFrame = () => import("@/layout/frameView.vue");
 const modulesRoutes = import.meta.glob("/src/views/**/*.{vue,tsx}");
 
 // 动态路由
-import { GetRoutes } from "@/api/admin.pb";
+import { GetRoutes, IResponseRoute } from "@/api/admin.pb";
 
 function handRank(routeInfo: any) {
   const { name, path, parentId, meta } = routeInfo;
@@ -151,40 +151,41 @@ function addPathMatch() {
 }
 
 /** 处理动态路由（后端返回的路由） */
-function handleAsyncRoutes(routeList) {
+function handleAsyncRoutes(routeList: IResponseRoute) {
   console.log("handleAsyncRoutes ", routeList);
-  if (routeList.length === 0) {
-    usePermissionStoreHook().handleWholeMenus(routeList);
+  if (routeList.item_list?.length === 0) {
+    usePermissionStoreHook().handleWholeMenus(routeList.item_list ?? []);
   } else {
-    formatFlatteningRoutes(addAsyncRoutes(routeList)).map(
-      (v: RouteRecordRaw) => {
-        // 防止重复添加路由
-        if (
-          router.options.routes[0].children.findIndex(
-            value => value.path === v.path
-          ) !== -1
-        ) {
-          return;
-        } else {
-          // 切记将路由push到routes后还需要使用addRoute，这样路由才能正常跳转
-          router.options.routes[0].children.push(v);
-          // 最终路由进行升序
-          ascending(router.options.routes[0].children);
-          if (!router.hasRoute(v?.name)) router.addRoute(v);
-          const flattenRouters: any = router
-            .getRoutes()
-            .find(n => n.path === "/");
-          router.addRoute(flattenRouters);
-        }
+    formatFlatteningRoutes(
+      addAsyncRoutes((routeList.item_list ?? []) as RouteRecordRaw[])
+    ).map((v: RouteRecordRaw) => {
+      // 防止重复添加路由
+      if (
+        router.options.routes[0].children.findIndex(
+          value => value.path === v.path
+        ) !== -1
+      ) {
+        return;
+      } else {
+        // 切记将路由push到routes后还需要使用addRoute，这样路由才能正常跳转
+        router.options.routes[0].children.push(v);
+        // 最终路由进行升序
+        ascending(router.options.routes[0].children);
+        if (!router.hasRoute(v?.name)) router.addRoute(v);
+        const flattenRouters: any = router
+          .getRoutes()
+          .find(n => n.path === "/");
+        router.addRoute(flattenRouters);
       }
-    );
-    usePermissionStoreHook().handleWholeMenus(routeList);
+    });
+    usePermissionStoreHook().handleWholeMenus(routeList.item_list ?? []);
   }
   addPathMatch();
 }
 
 /** 初始化路由（`new Promise` 写法防止在异步请求中造成无限循环）*/
 function initRouter() {
+  console.log("init router, ", getConfig());
   if (getConfig()?.CachingAsyncRoutes) {
     // 开启动态路由缓存本地sessionStorage
     const key = "async-routes";
@@ -204,8 +205,10 @@ function initRouter() {
       });
     }
   } else {
+    console.log("GetRoutes ... 1");
     return new Promise(resolve => {
       GetRoutes().then(({ data }) => {
+        console.log("GetRoutes ... response.. ", data);
         handleAsyncRoutes(cloneDeep(data));
         resolve(router);
       });
@@ -293,7 +296,7 @@ function handleAliveRoute({ name }: ToRouteType, mode?: string) {
 }
 
 /** 过滤后端传来的动态路由 重新生成规范路由 */
-function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
+function addAsyncRoutes(arrRoutes: RouteRecordRaw[]) {
   if (!arrRoutes || !arrRoutes.length) return;
   const modulesRoutesKeys = Object.keys(modulesRoutes);
   arrRoutes.forEach((v: RouteRecordRaw) => {

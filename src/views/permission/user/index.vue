@@ -8,7 +8,7 @@ defineOptions({
   name: "PermissionUser"
 });
 
-const showTree = ref(false);
+// const showTree = ref(false);
 const userList = ref<IUser[]>([]);
 const requestParam = ref<IRequestUsers>({ page: 1, page_size: 10 });
 const userTotal = ref(0);
@@ -98,7 +98,7 @@ const handleCurrentChange = (val: number) => {
             {{ getTimeStr(scope.row.update_time) }}
           </template>
         </el-table-column>
-        <el-table-column prop="update_user" label="是否禁用">
+        <el-table-column prop="update_user" label="禁用状态">
           <template #default="scope">
             <el-icon v-show="scope.row.ban" :size="20" color="red">
               <Remove />
@@ -133,7 +133,7 @@ const handleCurrentChange = (val: number) => {
 
 <style lang="scss">
 .space {
-  margin: 10px 10px;
+  margin: 10px;
 }
 
 .el-row {

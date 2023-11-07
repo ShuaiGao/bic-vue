@@ -49,8 +49,11 @@ export default [
     method: "get",
     response: () => {
       return {
-        success: true,
-        data: [permissionRouter]
+        code: 0,
+        detail: "success",
+        data: {
+          item_list: [permissionRouter]
+        }
       };
     }
   }
