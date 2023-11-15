@@ -1,11 +1,4 @@
-import type {
-  VNode,
-  FunctionalComponent,
-  PropType as VuePropType,
-  ComponentPublicInstance
-} from "vue";
 import type { ECharts } from "echarts";
-import type { IconifyIcon } from "@iconify/vue";
 import type { TableColumns } from "@pureadmin/table";
 
 /**
@@ -59,6 +52,7 @@ declare global {
    */
   interface ViteEnv {
     VITE_PORT: number;
+    VITE_APP_BASE_URL: string;
     VITE_PUBLIC_PATH: string;
     VITE_ROUTER_HISTORY: string;
     VITE_CDN: boolean;
