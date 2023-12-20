@@ -176,6 +176,7 @@ const defaultProps = {
       <el-button type="primary" v-if="!showTree" @click="onChangeShow"
         >表格显示
       </el-button>
+      <el-button type="primary" @click="getRoleList">刷新</el-button>
       <el-button type="primary">创建角色</el-button>
     </el-row>
     <el-row>
